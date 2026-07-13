@@ -1,4 +1,5 @@
 const userModel = require("../models/userModel");
+const bcrypt = require("bcryptjs");
 
 // register
 const registerController = async (req, res) => {
@@ -20,11 +21,16 @@ const registerController = async (req, res) => {
                 message:'Email already registered, please login!'
             });
         };
+
+        // hashing password
+        var salt = bcrypt.genSaltSync(10);
+        const hashed_password = await bcrypt.hash(password, salt);
+
         // creating new user
         const user = await userModel.create({
             username,
             email,
-            password,
+            password: hashed_password,
             address,
             phone
         });
@@ -58,11 +64,23 @@ const loginController = async (req, res) => {
         };
 
         // find user
-        const user = await userModel.findOne({email, password});
+        const user = await userModel.findOne({ email: email });
+
+        // compare hashed password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(500).send({
+                success:false,
+                message:'Invalid Credentials'
+            });
+        }
 
         // user not found
         if (!user) {
-            return res.redirect('/register');
+            return res.status(200).send({
+                success:true,
+                message:'User not found! Please register first.'
+            });
         }
         
         // login success
