@@ -1,13 +1,14 @@
 const userModel = require("../models/userModel");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // register
 const registerController = async (req, res) => {
     try {
-        const {username, email, password, phone, address, usertype} = req.body
+        const {username, email, password, phone, address, usertype, answer} = req.body
 
         // validation
-        if (!username || !email || !password || !phone || !address) {
+        if (!username || !email || !password || !phone || !address || !answer) {
             return res.status(500).send({
                 success:false,
                 message:'Please provide all the fields!'
@@ -32,8 +33,10 @@ const registerController = async (req, res) => {
             email,
             password: hashed_password,
             address,
-            phone
+            phone,
+            answer,
         });
+
         // returning response 
         res.status(201).send({
             success:true,
@@ -74,6 +77,10 @@ const loginController = async (req, res) => {
                 message:'Invalid Credentials'
             });
         }
+        // token
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: '7d'
+        });
 
         // user not found
         if (!user) {
@@ -83,11 +90,13 @@ const loginController = async (req, res) => {
             });
         }
         
+        user.password = undefined;
         // login success
         res.status(200).send({
             success:true,
             message:'Login successful!',
-            user
+            token,
+            user,
         });
 
     } catch(error) {

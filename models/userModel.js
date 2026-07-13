@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
     profile:{
         type:String,
         default:'https://png.pngtree.com/png-vector/20221203/ourmid/pngtree-cartoon-style-female-user-profile-icon-vector-illustraton-png-image_6489286.png'
+    },
+    answer:{
+        type:String,
+        required:[true, 'Answer is required!']
     }
 }, {timestamps:true});
 
