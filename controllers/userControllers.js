@@ -74,9 +74,9 @@ const updateUserController = async (req, res) => {
 // Update password
 const updateUserPassword = async (req, res) => {
     try {
-        const { email, newPassword, answer } = req.body;
+        const { email, oldPassword, newPassword } = req.body;
         // validation
-        if (!email || !newPassword || !answer) {
+        if (!email || !newPassword || !oldPassword) {
             return res.status(404).send({
                 success:false,
                 message:'Please provide all fields!'
@@ -92,24 +92,25 @@ const updateUserPassword = async (req, res) => {
             })
         }
 
-        if (user.answer !== answer) {
-            return res.status(401).send({
+        // hashing passwords
+        var salt = bcrypt.genSaltSync(10);
+        const hashed_new_password = await bcrypt.hash(newPassword, salt);
+        
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(500).send({
                 success:false,
-                message:'Invalid answer!'
+                message:'Invalid Password!'
             });
         }
 
-        // hashing new_password
-        var salt = bcrypt.genSaltSync(10);
-        const hashed_password = await bcrypt.hash(newPassword, salt);
-
         // resetting password
-        if (hashed_password) user.password = hashed_password;
+        if (hashed_new_password) user.password = hashed_new_password;
         await user.save();
 
         return res.status(200).send({
             success:true,
-            message:'Successfully reset password!'
+            message:'Successfully changed password!'
         });
 
     } catch(error) {
@@ -121,4 +122,41 @@ const updateUserPassword = async (req, res) => {
     }
 };
 
-module.exports = { getUserController, updateUserController, updateUserPassword };
+
+// delete user
+const deleteUserController = async (req, res) => {
+    try {
+        const id = req.user.id
+        // validation
+        if (!id) {
+            return res.status(500).send({
+                success:false,
+                message:'Please provide authorization token!'
+            });
+        }
+
+        const deletedUser = await userModel.findByIdAndDelete({ _id: id });
+
+        if (!deletedUser) {
+            return res.status(404).send({
+                success:false,
+                message:'User not found!'
+            });
+        }
+        
+        console.log("Deleted user:", deletedUser);
+        return res.status(200).send({
+            success:true,
+            message:'Deleted User!'
+        });
+
+    } catch(error) {
+        return res.status(500).send({
+            success:false,
+            message:'Error in delete API',
+            error
+        });
+    }
+};
+
+module.exports = { getUserController, updateUserController, updateUserPassword, deleteUserController };
