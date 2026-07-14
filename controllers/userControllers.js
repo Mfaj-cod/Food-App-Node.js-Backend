@@ -159,4 +159,9 @@ const deleteUserController = async (req, res) => {
     }
 };
 
-module.exports = { getUserController, updateUserController, updateUserPassword, deleteUserController };
+module.exports = { 
+    getUserController,
+    updateUserController,
+    updateUserPassword,
+    deleteUserController
+};
