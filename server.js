@@ -3,6 +3,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const dotenv = require('dotenv')
 const connectdb = require('./config/db')
+const authMiddleware = require('./middleware/authMiddleware')
 
 // dotenv configuration
 dotenv.config();
@@ -22,6 +23,7 @@ app.use('/api/v1/test', require('./routes/testRoutes'));
 app.use('/api/v1/auth', require('./routes/authRoutes'));
 app.use('/api/v1/user', require('./routes/userRoutes'));
 app.use('/api/v1/restaurant', require('./routes/restaurantRoutes'));
+app.use('/api/v1/category', require('./routes/categoryRoutes'));
 
 // url: http://localhost:8080
 // route

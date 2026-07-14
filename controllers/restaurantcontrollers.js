@@ -97,8 +97,6 @@ const getOneController = async (req, res) => {
 };
 
 // delete restaurant by id
-
-// get single restaurant by id
 const deleteRestaurantController = async (req, res) => {
     try {
         // get body
