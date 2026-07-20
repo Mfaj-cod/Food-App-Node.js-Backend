@@ -8,4 +8,4 @@ const router = express.Router()
 router.get('/test-user', testUserController);
 
 // export
-module.exports = router
+module.exports = router;

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 // schema
 const restaurantSchema = new mongoose.Schema({
